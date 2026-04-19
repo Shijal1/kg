@@ -4,8 +4,9 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    root: ./kasthamandap-ghar/backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: MONGODB_URI
         scope: build,runtime
