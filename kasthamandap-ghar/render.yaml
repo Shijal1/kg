@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: kasthamandap-ghar-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: MONGODB_URI
+        scope: build,runtime
+        value: "" # Add your MongoDB connection string
+      - key: JWT_SECRET
+        scope: build,runtime
+        value: "" # Add your JWT secret
+      - key: NODE_ENV
+        scope: build,runtime
+        value: "production"
