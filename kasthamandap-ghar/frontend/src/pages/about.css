@@ -1,0 +1,281 @@
+/* about.css */
+.about-page {
+  background: #fefefe;
+}
+
+.cultural-hero {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7))
+             ;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 80vh;
+  position: relative;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.nepali-font {
+  font-family: 'Preeti', 'Mangal', 'Noto Sans Devanagari', sans-serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.cultural-subtitle {
+  font-size: 1.2rem;
+  font-style: italic;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.section-title {
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+}
+
+.cultural-card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+}
+
+.cultural-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.cultural-image {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7));
+}
+
+.cultural-title {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.cultural-text {
+  color: #555;
+  line-height: 1.8;
+}
+
+.dish-card {
+  border: none;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  transition: all 0.3s ease;
+}
+
+.dish-card:hover {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.dish-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 2.5rem;
+  color: white;
+}
+
+.nepali-symbol {
+  font-family: 'Preeti', sans-serif;
+  font-size: 3rem;
+}
+
+.dish-name {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.nepali-text {
+  font-family: 'Preeti', 'Mangal', sans-serif;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.dish-description {
+  color: #555;
+  margin-bottom: 0;
+}
+
+.cultural-badge {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.cultural-significance {
+  background: rgba(102, 126, 234, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.heritage-timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.heritage-timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #667eea, #764ba2);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 40px;
+  padding-left: 30px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #667eea;
+  border: 3px solid white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.timeline-year {
+  position: absolute;
+  left: -100px;
+  top: 0;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.timeline-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-content h5 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.value-card {
+  border: none;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+  background: white;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.value-icon {
+  font-size: 2.5rem;
+}
+
+.cultural-invitation {
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #888a92 0%, #c1223a 100%);
+  color: white;
+  overflow: hidden;
+}
+
+.cultural-invitation .lead {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cultural-hero {
+    min-height: 60vh;
+    background-attachment: scroll;
+  }
+  
+  .hero-overlay {
+    min-height: 60vh;
+  }
+  
+  .timeline-year {
+    position: relative;
+    left: 0;
+    top: 0;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  
+  .heritage-timeline {
+    padding-left: 20px;
+  }
+  
+  .heritage-timeline::before {
+    left: 10px;
+  }
+  
+  .timeline-item {
+    padding-left: 20px;
+  }
+  
+  .timeline-item::before {
+    left: -6px;
+  }
+}

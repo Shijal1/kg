@@ -1,0 +1,66 @@
+/* About Page Styles */
+.feature-icon-circle {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.specialty-icon .icon-placeholder {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(45deg, #dc143c, #003893);
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Clean Background */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Card Hover Effects */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Hero Section for Home */
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+              url('/public/images/nepal-pattern.png');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 100px 0;
+}
+
+/* Fix search icon position */
+.search-icon {
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.clear-search {
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
