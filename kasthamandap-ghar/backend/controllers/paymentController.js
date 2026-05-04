@@ -1,24 +1,27 @@
-import Payment from '../models/Payment.js';
-import Order from '../models/Order.js';
 import { v4 as uuidv4 } from 'uuid';
+import db from '../config/db.js';
+
+const Payment = db.Payment;
+const Order = db.Order;
+const User = db.User;
 
 export const createPayment = async (req, res) => {
   try {
     const { orderId, paymentMethod, amount } = req.body;
     
-    const order = await Order.findById(orderId);
+    const order = await Order.findByPk(orderId);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
     // Check if order belongs to user
-    if (order.user.toString() !== req.user._id.toString()) {
+    if (order.userId !== req.user.id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
     const transactionId = `TXN${uuidv4().substring(0, 8).toUpperCase()}`;
 
-    // 🔹 FIX: Cash on Delivery handling
+    // Cash on Delivery handling
     let paymentStatus = 'pending';
 
     if (paymentMethod === 'cash') {
@@ -32,19 +35,18 @@ export const createPayment = async (req, res) => {
       order.isPaid = true;
     }
 
-    const payment = new Payment({
-      order: orderId,
-      user: req.user._id,
+    const payment = await Payment.create({
+      orderId,
+      userId: req.user.id,
       paymentMethod,
       amount,
       transactionId,
       paymentStatus
     });
 
-    const createdPayment = await payment.save();
     await order.save();
 
-    res.status(201).json(createdPayment);
+    res.status(201).json(payment);
   } catch (error) {
     console.error('Create payment error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -55,19 +57,19 @@ export const completePayment = async (req, res) => {
   try {
     const { transactionId } = req.params;
     
-    const payment = await Payment.findOne({ transactionId });
+    const payment = await Payment.findOne({ where: { transactionId } });
     if (!payment) {
       return res.status(404).json({ message: 'Payment not found' });
     }
 
     payment.paymentStatus = 'completed';
-    payment.paymentDate = Date.now();
+    payment.paymentDate = new Date();
     payment.qrScanned = true;
 
     await payment.save();
 
     // Update order
-    const order = await Order.findById(payment.order);
+    const order = await Order.findByPk(payment.orderId);
     if (order) {
       order.isPaid = true;
       await order.save();
@@ -84,9 +86,13 @@ export const getPaymentStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
     
-    const payment = await Payment.findOne({ order: orderId })
-      .populate('order')
-      .populate('user', 'name email');
+    const payment = await Payment.findOne({
+      where: { orderId },
+      include: [
+        { model: Order, as: 'order' },
+        { model: User, as: 'user', attributes: ['id', 'name', 'email'] }
+      ]
+    });
 
     if (!payment) {
       return res.status(404).json({ message: 'Payment not found' });

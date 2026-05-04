@@ -1,4 +1,7 @@
-import Product from '../models/Product.js';
+import { Op } from 'sequelize';
+import db from '../config/db.js';
+
+const Product = db.Product;
 
 // @desc    Get all products with search and filter
 // @route   GET /api/products
@@ -6,21 +9,21 @@ import Product from '../models/Product.js';
 export const getProducts = async (req, res) => {
   try {
     const { category, search } = req.query;
-    let filter = {};
+    let whereClause = {};
 
     if (category && category !== 'all') {
-      filter.category = category;
+      whereClause.category = category;
     }
 
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } }
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+        { category: { [Op.iLike]: `%${search}%` } }
       ];
     }
 
-    const products = await Product.find(filter);
+    const products = await Product.findAll({ where: whereClause });
     res.json(products);
   } catch (error) {
     console.error('Get products error:', error);
@@ -33,14 +36,15 @@ export const getProducts = async (req, res) => {
 // @access  Public
 export const searchProducts = async (req, res) => {
   try {
-    const keyword = req.params.keyword ? {
-      $or: [
-        { name: { $regex: req.params.keyword, $options: 'i' } },
-        { description: { $regex: req.params.keyword, $options: 'i' } }
-      ]
-    } : {};
+    let whereClause = {};
+    if (req.params.keyword) {
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${req.params.keyword}%` } },
+        { description: { [Op.iLike]: `%${req.params.keyword}%` } }
+      ];
+    }
 
-    const products = await Product.find(keyword);
+    const products = await Product.findAll({ where: whereClause });
     res.json(products);
   } catch (error) {
     console.error('Search products error:', error);
@@ -53,7 +57,7 @@ export const searchProducts = async (req, res) => {
 // @access  Public
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     if (product) {
       res.json(product);
     } else {
@@ -70,9 +74,8 @@ export const getProductById = async (req, res) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
+    const product = await Product.create(req.body);
+    res.status(201).json(product);
   } catch (error) {
     console.error('Create product error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -84,7 +87,7 @@ export const createProduct = async (req, res) => {
 // @access  Private/Admin
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     
     if (product) {
       product.name = req.body.name || product.name;
@@ -110,10 +113,10 @@ export const updateProduct = async (req, res) => {
 // @access  Private/Admin
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     
     if (product) {
-      await product.deleteOne();
+      await product.destroy();
       res.json({ message: 'Product removed' });
     } else {
       res.status(404).json({ message: 'Product not found' });

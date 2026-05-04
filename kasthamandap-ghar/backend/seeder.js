@@ -1,8 +1,5 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Product from './models/Product.js';
-import User from './models/User.js';
-import bcrypt from 'bcryptjs';
+import db from './config/db.js';
 
 dotenv.config();
 
@@ -1110,36 +1107,38 @@ const products = [
 
 const seedDatabase = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ Connected to MongoDB');
+    await db.sequelize.authenticate();
+    console.log('✅ Connected to PostgreSQL');
 
-    // Clear existing data
-    await Product.deleteMany({});
-    console.log('✅ Cleared existing products');
+    await db.sequelize.sync({ alter: true });
+    console.log('✅ Database schema synchronized');
 
-    // Insert products
-    await Product.insertMany(products);
-    console.log(`✅ Seeded ${products.length} products`);
+    const existingProducts = await db.Product.count();
+    if (existingProducts > 0) {
+      console.log(`✅ ${existingProducts} products already exist; skipping product seed.`);
+    } else {
+      await db.Product.bulkCreate(products);
+      console.log(`✅ Seeded ${products.length} products`);
+    }
 
-    // Create admin user
-    const adminUser = await User.findOne({ email: 'admin@kasthamandapghar.com' });
-    if (!adminUser) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('admin123', salt);
-      
-      await User.create({
+    const adminEmail = 'admin@kasthamandapghar.com';
+    const existingAdmin = await db.User.findOne({ where: { email: adminEmail } });
+    if (!existingAdmin) {
+      await db.User.create({
         name: 'Admin User',
-        email: 'admin@kasthamandapghar.com',
-        password: hashedPassword,
+        email: adminEmail,
+        password: 'admin123',
         phone: '9800000000',
         address: 'Thamel, Kathmandu',
         role: 'admin'
       });
       console.log('✅ Created admin user');
+    } else {
+      console.log(`✅ Admin user already exists (${adminEmail})`);
     }
 
     console.log('🎉 Database seeding completed!');
-    process.exit();
+    process.exit(0);
   } catch (error) {
     console.error('❌ Seeding error:', error);
     process.exit(1);

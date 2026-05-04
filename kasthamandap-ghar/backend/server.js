@@ -1,8 +1,8 @@
-// server.js - UPDATED for Production
+// server.js - PostgreSQL with Sequelize
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import db from './config/db.js';
 
 // Import Routes
 import authRoutes from './routes/authRoutes.js';
@@ -39,19 +39,25 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
+// PostgreSQL Connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('? MongoDB Connected Successfully');
+    await db.sequelize.authenticate();
+    console.log('✓ PostgreSQL Connected Successfully');
+    
+    // Sync database - creates tables if they don't exist
+    // Use {alter: true} for development to auto-update schema
+    // Set {force: true} only for testing to drop/recreate tables
+    await db.sequelize.sync({ alter: true });
+    console.log('✓ Database synchronized');
   } catch (error) {
-    console.error('? MongoDB Connection Error:', error);
+    console.error('✗ PostgreSQL Connection Error:', error);
     process.exit(1);
   }
 };
 
-// Connect to MongoDB
-connectDB();
+// Connect to PostgreSQL
+await connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -81,5 +87,5 @@ const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 app.listen(PORT, () => {
-  console.log(`? Server running on port ${PORT} in ${NODE_ENV} mode`);
+  console.log(`✓ Server running on port ${PORT} in ${NODE_ENV} mode`);
 });

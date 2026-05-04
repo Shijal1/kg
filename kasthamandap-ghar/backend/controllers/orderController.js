@@ -1,5 +1,8 @@
-import Order from '../models/Order.js';
-import Product from '../models/Product.js';
+import db from '../config/db.js';
+
+const Order = db.Order;
+const Product = db.Product;
+const User = db.User;
 
 /* =========================
    Create New Order
@@ -17,7 +20,7 @@ export const createOrder = async (req, res) => {
 
     let itemsPrice = 0;
     for (const item of items) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findByPk(item.product);
       if (product) {
         itemsPrice += product.price * item.quantity;
       }
@@ -26,8 +29,8 @@ export const createOrder = async (req, res) => {
     const taxPrice = itemsPrice * 0.13; // 13% VAT
     const totalPrice = itemsPrice + taxPrice;
 
-    const order = new Order({
-      user: req.user._id,
+    const order = await Order.create({
+      userId: req.user.id,
       items: items.map(item => ({
         ...item,
         name: item.name,
@@ -41,8 +44,7 @@ export const createOrder = async (req, res) => {
       status: 'pending'
     });
 
-    const createdOrder = await order.save();
-    res.status(201).json(createdOrder);
+    res.status(201).json(order);
   } catch (error) {
     console.error('Create order error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -57,14 +59,16 @@ export const createOrder = async (req, res) => {
 // @access  Private
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate('user', 'name email');
+    const order = await Order.findByPk(req.params.id, {
+      include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email'] }]
+    });
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
     if (
-      order.user._id.toString() !== req.user._id.toString() &&
+      order.userId !== req.user.id &&
       req.user.role !== 'admin'
     ) {
       return res.status(401).json({ message: 'Not authorized' });
@@ -85,7 +89,7 @@ export const getOrderById = async (req, res) => {
 // @access  Private
 export const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id });
+    const orders = await Order.findAll({ where: { userId: req.user.id } });
     res.json(orders);
   } catch (error) {
     console.error('Get my orders error:', error);
@@ -101,7 +105,9 @@ export const getMyOrders = async (req, res) => {
 // @access  Private/Admin
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({}).populate('user', 'name email');
+    const orders = await Order.findAll({
+      include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email'] }]
+    });
     res.json(orders);
   } catch (error) {
     console.error('Get orders error:', error);
@@ -117,7 +123,7 @@ export const getOrders = async (req, res) => {
 // @access  Private
 export const updateOrderStatus = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findByPk(req.params.id);
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -125,7 +131,7 @@ export const updateOrderStatus = async (req, res) => {
 
     // Owner or admin check
     if (
-      order.user.toString() !== req.user._id.toString() &&
+      order.userId !== req.user.id &&
       req.user.role !== 'admin'
     ) {
       return res.status(401).json({ message: 'Not authorized' });
@@ -142,7 +148,6 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     order.status = req.body.status;
-
     const updatedOrder = await order.save();
     res.json(updatedOrder);
   } catch (error) {
@@ -159,16 +164,14 @@ export const updateOrderStatus = async (req, res) => {
 // @access  Private/Admin
 export const updateOrderToDelivered = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findByPk(req.params.id);
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
     order.isDelivered = true;
-    order.deliveredAt = Date.now();
     order.status = 'delivered';
-
     const updatedOrder = await order.save();
     res.json(updatedOrder);
   } catch (error) {

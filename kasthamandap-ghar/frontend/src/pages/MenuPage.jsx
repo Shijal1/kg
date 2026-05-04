@@ -61,11 +61,12 @@ const MenuPage = () => {
 
   const addToCart = (product) => {
     const cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : []
-    const existItem = cartItems.find(x => x._id === product._id)
+    const productId = product.id || product._id
+    const existItem = cartItems.find(x => (x.id || x._id) === productId)
     
     if (existItem) {
       const updatedCart = cartItems.map(x => 
-        x._id === product._id ? { ...x, quantity: x.quantity + 1 } : x
+        (x.id || x._id) === productId ? { ...x, quantity: x.quantity + 1 } : x
       )
       localStorage.setItem('cartItems', JSON.stringify(updatedCart))
     } else {
@@ -163,7 +164,7 @@ const MenuPage = () => {
         ) : (
           <Row>
             {filteredProducts.map((product) => (
-              <Col key={product._id} lg={3} md={4} sm={6} className="mb-4">
+              <Col key={product.id || product._id} lg={3} md={4} sm={6} className="mb-4">
                 <Card 
                   className="h-100 shadow-sm product-card" 
                   onClick={() => handleProductClick(product)}
@@ -171,7 +172,8 @@ const MenuPage = () => {
                 >
                   <Card.Img 
                     variant="top" 
-                    src={`public/images/${product.image}`} 
+                    src={`/images/${product.image}`} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/images/default.jpg'; }}
                     style={{ height: '200px', objectFit: 'cover' }}
                     alt={product.name}
                   />
@@ -228,7 +230,8 @@ const MenuPage = () => {
               <Row>
                 <Col md={6}>
                   <img 
-                    src={`public/images/${selectedProduct.image}`} 
+                    src={`/images/${selectedProduct.image}`} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/images/default.jpg'; }}
                     alt={selectedProduct.name}
                     className="img-fluid rounded"
                     style={{ maxHeight: '300px', objectFit: 'cover', width: '100%' }}

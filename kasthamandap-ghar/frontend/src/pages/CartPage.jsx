@@ -39,7 +39,7 @@ const CartPage = () => {
     if (newQuantity < 1) return;
     
     const updatedCart = cartItems.map(item => 
-      item._id === id ? { ...item, quantity: newQuantity } : item
+      (item.id || item._id) === id ? { ...item, quantity: newQuantity } : item
     );
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
@@ -47,7 +47,7 @@ const CartPage = () => {
   };
 
   const removeItem = (id) => {
-    const updatedCart = cartItems.filter(item => item._id !== id);
+    const updatedCart = cartItems.filter(item => (item.id || item._id) !== id);
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
     window.dispatchEvent(new Event('storage'));
@@ -87,7 +87,7 @@ const CartPage = () => {
     try {
       const orderData = {
         items: cartItems.map(item => ({
-          product: item._id,
+          product: item.id || item._id,
           name: item.name,
           quantity: item.quantity,
           price: item.price
@@ -109,7 +109,7 @@ const CartPage = () => {
       const { data } = await axios.post('/api/orders', orderData, config);
       
       // For cash on delivery, redirect to order confirmation
-      navigate(`/order/${data._id}`);
+      navigate(`/order/${data.id || data._id}`);
       
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to place order');
@@ -189,16 +189,16 @@ const CartPage = () => {
                     </thead>
                     <tbody>
                       {cartItems.map((item) => (
-                        <tr key={item._id} className="cart-item-row">
+                        <tr key={item.id || item._id} className="cart-item-row">
                           <td>
                             <div className="d-flex align-items-center">
                               <div className="cart-item-image">
                                 <img 
-                                  src={`public/images/${item.image}`} 
+                                  src={`/images/${item.image}`} 
                                   alt={item.name}
                                   onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = "public/images/default-food.jpg";
+                                    e.target.src = "/images/default-food.jpg";
                                   }}
                                 />
                               </div>
@@ -218,7 +218,7 @@ const CartPage = () => {
                               <Button 
                                 variant="outline-secondary" 
                                 size="sm"
-                                onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                                onClick={() => updateQuantity(item.id || item._id, item.quantity - 1)}
                                 disabled={item.quantity <= 1}
                                 className="quantity-btn"
                               >
@@ -228,7 +228,7 @@ const CartPage = () => {
                               <Button 
                                 variant="outline-secondary" 
                                 size="sm"
-                                onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                                onClick={() => updateQuantity(item.id || item._id, item.quantity + 1)}
                                 className="quantity-btn"
                               >
                                 <Plus />
@@ -240,7 +240,7 @@ const CartPage = () => {
                             <Button 
                               variant="outline-danger" 
                               size="sm"
-                              onClick={() => removeItem(item._id)}
+                              onClick={() => removeItem(item.id || item._id)}
                               className="remove-btn"
                               title="Remove item"
                             >

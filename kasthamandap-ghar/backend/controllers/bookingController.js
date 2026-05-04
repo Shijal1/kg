@@ -1,6 +1,9 @@
 // controllers/bookingController.js
-import Booking from '../models/Booking.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Op } from 'sequelize';
+import db from '../config/db.js';
+
+const Booking = db.Booking;
+const User = db.User;
 
 // @desc    Create new booking
 // @route   POST /api/bookings
@@ -33,8 +36,8 @@ export const createBooking = async (req, res) => {
     const totalPrice = priceMap[tableType] || 0;
     const depositAmount = ['birthday-party', 'group-5-6'].includes(tableType) ? totalPrice * 0.5 : 0;
 
-    const booking = new Booking({
-      user: req.user._id,
+    const booking = await Booking.create({
+      userId: req.user.id,
       bookingType,
       tableType,
       bookingDate: new Date(bookingDate),
@@ -49,14 +52,7 @@ export const createBooking = async (req, res) => {
       status: depositAmount > 0 ? 'pending' : 'confirmed'
     });
 
-    const createdBooking = await booking.save();
-    
-    // If deposit required, create payment record
-    if (depositAmount > 0) {
-      // Create payment record logic here
-    }
-
-    res.status(201).json(createdBooking);
+    res.status(201).json(booking);
   } catch (error) {
     console.error('Create booking error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -68,8 +64,10 @@ export const createBooking = async (req, res) => {
 // @access  Private
 export const getMyBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id })
-      .sort({ bookingDate: -1 });
+    const bookings = await Booking.findAll({
+      where: { userId: req.user.id },
+      order: [['bookingDate', 'DESC']]
+    });
     res.json(bookings);
   } catch (error) {
     console.error('Get bookings error:', error);
@@ -82,14 +80,15 @@ export const getMyBookings = async (req, res) => {
 // @access  Private
 export const getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id)
-      .populate('user', 'name email phone');
+    const booking = await Booking.findByPk(req.params.id, {
+      include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email', 'phone'] }]
+    });
 
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    if (booking.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    if (booking.userId !== req.user.id && req.user.role !== 'admin') {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
@@ -105,7 +104,7 @@ export const getBookingById = async (req, res) => {
 // @access  Private/Admin
 export const updateBookingStatus = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findByPk(req.params.id);
 
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
@@ -139,12 +138,14 @@ export const getAvailability = async (req, res) => {
     ];
 
     // Check bookings for the date
-    const bookings = await Booking.find({
-      bookingDate: {
-        $gte: new Date(date + 'T00:00:00'),
-        $lt: new Date(date + 'T23:59:59')
-      },
-      status: { $in: ['confirmed', 'pending'] }
+    const bookings = await Booking.findAll({
+      where: {
+        bookingDate: {
+          [Op.gte]: new Date(date + 'T00:00:00'),
+          [Op.lt]: new Date(date + 'T23:59:59')
+        },
+        status: { [Op.in]: ['confirmed', 'pending'] }
+      }
     });
 
     // Calculate availability

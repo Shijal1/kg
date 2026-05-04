@@ -26,11 +26,12 @@ const HomePage = () => {
 
   const addToCart = (product) => {
     const cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : []
-    const existItem = cartItems.find(x => x._id === product._id)
+    const productId = product.id || product._id
+    const existItem = cartItems.find(x => (x.id || x._id) === productId)
     
     if (existItem) {
       const updatedCart = cartItems.map(x => 
-        x._id === product._id ? { ...x, quantity: x.quantity + 1 } : x
+        (x.id || x._id) === productId ? { ...x, quantity: x.quantity + 1 } : x
       )
       localStorage.setItem('cartItems', JSON.stringify(updatedCart))
     } else {
@@ -118,11 +119,12 @@ const HomePage = () => {
         ) : (
           <Row>
             {featuredProducts.map((product) => (
-              <Col key={product._id} lg={3} md={6} className="mb-4">
+              <Col key={product.id || product._id} lg={3} md={6} className="mb-4">
                 <Card className="h-100 shadow-sm product-card">
                   <Card.Img 
                     variant="top" 
-                    src={`public/images/${product.image}`} 
+                    src={`/images/${product.image}`} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/images/default.jpg'; }}
                     style={{ height: '200px', objectFit: 'cover' }}
                     alt={product.name}
                   />

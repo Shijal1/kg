@@ -233,7 +233,7 @@ const PaymentPage = () => {
                 <div className="text-center mb-4">
                   <div className="border rounded p-4 mb-3 d-inline-block bg-white shadow-sm">
                     <img 
-                      src="public/images/qr2.jpg" 
+                      src="/images/qr2.jpg" 
                       alt="Payment QR Code" 
                       style={{ width: '250px', height: '250px' }}
                       onError={(e) => {

@@ -31,7 +31,7 @@ const AboutPage = () => {
     <div className="about-page">
       {/* Hero Section with ktm.jpg background */}
       <div className="cultural-hero" style={{
-        background: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/public/images/katm.jpg')`,
+        background: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/images/katm.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -82,7 +82,7 @@ const AboutPage = () => {
                 <Col lg={6} key={index}>
                   <Card className="cultural-card h-100">
                     <div className="cultural-image" 
-                         style={{backgroundImage: `url(public/images/${item.image})`}}>
+                         style={{backgroundImage: `url('/images/${item.image}')`}}>
                       <div className="image-overlay"></div>
                     </div>
                     <Card.Body>

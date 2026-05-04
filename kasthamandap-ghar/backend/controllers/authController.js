@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import db from '../config/db.js';
+
+const User = db.User;
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -15,7 +17,7 @@ export const register = async (req, res) => {
     const { name, email, password, phone, address } = req.body;
 
     // Check if user exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -31,13 +33,13 @@ export const register = async (req, res) => {
 
     if (user) {
       res.status(201).json({
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         phone: user.phone,
         address: user.address,
         role: user.role,
-        token: generateToken(user._id)
+        token: generateToken(user.id)
       });
     }
   } catch (error) {
@@ -54,7 +56,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Check for user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -66,13 +68,13 @@ export const login = async (req, res) => {
     }
 
     res.json({
-      _id: user._id,
+      id: user.id,
       name: user.name,
       email: user.email,
       phone: user.phone,
       address: user.address,
       role: user.role,
-      token: generateToken(user._id)
+      token: generateToken(user.id)
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -85,7 +87,9 @@ export const login = async (req, res) => {
 // @access  Private
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ['password'] }
+    });
     res.json(user);
   } catch (error) {
     console.error('Get profile error:', error);
@@ -98,7 +102,7 @@ export const getProfile = async (req, res) => {
 // @access  Private
 export const updateProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findByPk(req.user.id);
 
     if (user) {
       user.name = req.body.name || user.name;
@@ -113,13 +117,13 @@ export const updateProfile = async (req, res) => {
       const updatedUser = await user.save();
 
       res.json({
-        _id: updatedUser._id,
+        id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
         phone: updatedUser.phone,
         address: updatedUser.address,
         role: updatedUser.role,
-        token: generateToken(updatedUser._id)
+        token: generateToken(updatedUser.id)
       });
     }
   } catch (error) {
