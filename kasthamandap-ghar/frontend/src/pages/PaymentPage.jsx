@@ -15,6 +15,7 @@ const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('qr')
   const [user, setUser] = useState(null)
   const [qrScanned, setQrScanned] = useState(false)
+  const orderIdValue = order?.id || order?._id
 
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo')
@@ -60,7 +61,7 @@ const PaymentPage = () => {
       
       // For other payment methods, proceed immediately
       const paymentData = {
-        orderId: order._id,
+        orderId: orderIdValue,
         paymentMethod: paymentMethod,
         amount: order.totalPrice
       }
@@ -91,7 +92,7 @@ const PaymentPage = () => {
       setPaymentLoading(true)
       
       const paymentData = {
-        orderId: order._id,
+        orderId: orderIdValue,
         paymentMethod: 'qr',
         amount: order.totalPrice
       }
@@ -162,7 +163,7 @@ const PaymentPage = () => {
               <h5 className="fw-bold mb-3">Order Summary</h5>
               <div className="d-flex justify-content-between mb-2">
                 <span>Order ID:</span>
-                <span className="fw-bold">#{order._id.substring(0, 8).toUpperCase()}</span>
+                <span className="fw-bold">#{(orderIdValue || '').substring(0, 8).toUpperCase()}</span>
               </div>
               <div className="d-flex justify-content-between mb-2">
                 <span>Items Price:</span>
@@ -238,7 +239,7 @@ const PaymentPage = () => {
                       style={{ width: '250px', height: '250px' }}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=KasthamandapGhar-" + order._id;
+                        e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=KasthamandapGhar-" + orderIdValue;
                         console.log("Using fallback QR image");
                       }}
                     />

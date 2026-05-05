@@ -1096,6 +1096,16 @@ const products = [
     numReviews: 255,
     preparationTime: 12
 
+  },
+  {
+    name:'Chocolate Brownie',
+    description: 'Brownie Set',
+    price: 149,
+    category: 'desserts',
+    image: 'brownie.jpg',
+    rating: 4.5,
+    numReviews: 2,
+    preparationTime:5
   }
 
 ];
@@ -1114,11 +1124,19 @@ const seedDatabase = async () => {
     console.log('✅ Database schema synchronized');
 
     const existingProducts = await db.Product.count();
-    if (existingProducts > 0) {
-      console.log(`✅ ${existingProducts} products already exist; skipping product seed.`);
-    } else {
+    if (existingProducts === 0) {
       await db.Product.bulkCreate(products);
       console.log(`✅ Seeded ${products.length} products`);
+    } else {
+      let addedCount = 0;
+      for (const product of products) {
+        const [savedProduct, created] = await db.Product.findOrCreate({
+          where: { name: product.name },
+          defaults: product
+        });
+        if (created) addedCount += 1;
+      }
+      console.log(`✅ ${existingProducts} products already existed. Added ${addedCount} new product(s).`);
     }
 
     const adminEmail = 'admin@kasthamandapghar.com';

@@ -11,6 +11,7 @@ const OrderDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
+  const orderIdValue = order?.id || order?._id;
 
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
@@ -103,7 +104,7 @@ const OrderDetailsPage = () => {
             <Card.Body>
               <div className="d-flex justify-content-between align-items-start mb-4">
                 <div>
-                  <h5 className="fw-bold">Order #{order._id.substring(18)}</h5>
+                  <h5 className="fw-bold">Order #{(orderIdValue || '').substring(18)}</h5>
                   <p className="text-muted mb-0">
                     Placed on {new Date(order.createdAt).toLocaleDateString()}
                   </p>

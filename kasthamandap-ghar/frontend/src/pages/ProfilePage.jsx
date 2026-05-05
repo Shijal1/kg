@@ -80,7 +80,7 @@ const ProfilePage = () => {
         }
       }
       
-      await axios.put(`/api/orders/${orderToCancel._id}/status`, {
+      await axios.put(`/api/orders/${getEntityId(orderToCancel)}/status`, {
         status: 'cancelled'
       }, config)
       
@@ -130,6 +130,8 @@ const ProfilePage = () => {
       minute: '2-digit'
     })
   }
+
+  const getEntityId = (entity) => entity?.id || entity?._id
 
   const viewOrderDetails = (orderId) => {
     navigate(`/order/${orderId}`)
@@ -261,9 +263,9 @@ const ProfilePage = () => {
                         </thead>
                         <tbody>
                           {orders.map((order) => (
-                            <tr key={order._id}>
+                            <tr key={getEntityId(order)}>
                               <td>
-                                <small className="text-muted">#{order._id.substring(18)}</small>
+                                <small className="text-muted">#{(getEntityId(order) || '').substring(18)}</small>
                               </td>
                               <td>
                                 <small>{formatDate(order.createdAt)}</small>
@@ -276,7 +278,7 @@ const ProfilePage = () => {
                                   <Button 
                                     variant="outline-info" 
                                     size="sm"
-                                    onClick={() => viewOrderDetails(order._id)}
+                                    onClick={() => viewOrderDetails(getEntityId(order))}
                                     title="View Details"
                                   >
                                     <Eye />
@@ -336,7 +338,7 @@ const ProfilePage = () => {
                         </thead>
                         <tbody>
                           {bookings.map((booking) => (
-                            <tr key={booking._id}>
+                            <tr key={getEntityId(booking)}>
                               <td>
                                 <div className="fw-semibold">
                                   {formatBookingDate(booking.bookingDate)}
@@ -379,7 +381,7 @@ const ProfilePage = () => {
           Are you sure you want to cancel this order?
           {orderToCancel && (
             <div className="mt-3">
-              <p><strong>Order ID:</strong> #{orderToCancel._id.substring(18)}</p>
+              <p><strong>Order ID:</strong> #{(getEntityId(orderToCancel) || '').substring(18)}</p>
               <p><strong>Total:</strong> Rs. {orderToCancel.totalPrice?.toFixed(2)}</p>
               <p><strong>Items:</strong> {orderToCancel.items.length} item(s)</p>
             </div>

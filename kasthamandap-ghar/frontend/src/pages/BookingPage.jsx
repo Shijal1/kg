@@ -395,7 +395,7 @@ const BookingPage = () => {
             <div>
               <p>Your table has been reserved successfully!</p>
               <div className="confirmation-details">
-                <p><strong>Booking Reference:</strong> {bookingDetails._id.substring(18, 24).toUpperCase()}</p>
+                <p><strong>Booking Reference:</strong> {(bookingDetails?.id || bookingDetails?._id || '').substring(18, 24).toUpperCase()}</p>
                 <p><strong>Date:</strong> {new Date(bookingDetails.bookingDate).toLocaleDateString()}</p>
                 <p><strong>Time:</strong> {bookingDetails.timeSlot}</p>
                 <p><strong>Table:</strong> {bookingDetails.tableType}</p>
